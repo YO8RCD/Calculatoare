@@ -1,0 +1,99 @@
+def calculeaza_efhw(freq_khz, grosime, izolata, inaltime_m, unun_raport):
+    freq_mhz = freq_khz / 1000.0
+    lambda_m = 300.0 / freq_mhz
+    inaltime_lambda = inaltime_m / lambda_m
+
+    # 1. Factorul de viteză de bază (spațiu liber + efect de capăt)
+    vf_total = 0.96
+
+    # 2. Corecție izolație
+    k_izolatie = 0.97 if izolata else 1.0
+    vf_total *= k_izolatie
+
+    # 3. Corecție înălțime față de sol
+    if inaltime_lambda < 0.25:
+        k_inaltime = 1.0 - (0.04 * (1.0 - (inaltime_lambda / 0.25)))
+    else:
+        k_inaltime = 1.0
+    vf_total *= k_inaltime
+
+    # 4. Corecție grosime fir
+    k_grosime = 0.995 if grosime > 2.5 else 1.0
+    vf_total *= k_grosime
+
+    # 5. Calcul fizic final radiant (jumătate de undă)
+    lungime_fir = (150.0 / freq_mhz) * vf_total
+
+    # 6. Calcul lungime contragreutate (~0.05 * lambda) cu Vf de 0.95 pentru sol
+    lungime_contragreutate = (lambda_m * 0.05) * 0.95
+
+    # 7. Estimare Impedanță
+    imp_antena = 3000
+    if inaltime_lambda < 0.1:
+        imp_antena = 2100
+    elif inaltime_lambda < 0.25:
+        imp_antena = 2450
+
+    imp_statie = imp_antena / unun_raport
+    swr = (imp_statie / 50.0) if (imp_statie >= 50) else (50.0 / imp_statie)
+
+    # Returnăm toate rezultatele sub formă de dicționar
+    return {
+        "lungime_radiant": round(lungime_fir, 2),
+        "lungime_contragreutate": round(lungime_contragreutate, 2),
+        "impedanta_antena": imp_antena,
+        "impedanta_statie": round(imp_statie, 1),
+        "swr": round(swr, 2),
+        "vf_final": round(vf_total, 3)
+    }
+
+# --- INTERFAȚA INTERACTIVĂ ÎN TERMINAL ---
+if __name__ == "__main__":
+    print("=" * 45)
+    print("      CALCULATOR ANTENĂ EFHW (YO8RCD)      ")
+    print("=" * 45)
+    
+    # Preluare date de la utilizator
+    frecventa = float(input("Introduceți frecvența dorită în kHz (ex: 3650): "))
+    
+    print("\nGrosime fir:")
+    print("1 -> 1.5 mm² (Standard / subțire)")
+    print("2 -> 2.5 mm² sau mai gros")
+    optiune_grosime = input("Alegeți opțiunea (1 sau 2): ")
+    grosime_mm2 = 4.0 if optiune_grosime == "2" else 1.5
+    
+    print("\nTipul firului:")
+    print("1 -> Fir izolat (MYF / PVC)")
+    print("2 -> Fir chel (Cupru chior / Emailat)")
+    optiune_izolatie = input("Alegeți opțiunea (1 sau 2): ")
+    este_izolat = True if optiune_izolatie == "1" else False
+    
+    inaltime = float(input("\nÎnălțimea medie de instalare față de sol (metri): "))
+    
+    print("\nRaport transformator UNUN:")
+    print("1 -> 49:1")
+    print("2 -> 64:1")
+    optiune_unun = input("Alegeți opțiunea (1 sau 2): ")
+    raport = 64 if optiune_unun == "2" else 49
+
+    # Executare calcul
+    res = calculeaza_efhw(frecventa, grosime_mm2, este_izolat, inaltime, raport)
+
+    # Afișare rezultate
+    print("\n" + "=" * 45)
+    print("               REZULTATE ESTIMATE            ")
+    print("=" * 45)
+    print(f"-> Lungime fir radiant (1/2 lambda): {res['lungime_radiant']} metri")
+    print(f"-> Lungime contragreutate (~0.05 lm): {res['lungime_contragreutate']} metri")
+    print(f"-> Impedanță la capătul antenei:     {res['impedanta_antena']} Ohmi")
+    print(f"-> Impedanță reflectată în coaxial:  {res['impedanta_statie']} Ohmi")
+    print(f"-> SWR estimat (la mufa UNUN):        {res['swr']}:1")
+    print("-" * 45)
+    print("Recomandare instalare YO8RCD:")
+    print("Conectați contragreutatea la masa UNUN-ului. Imediat după")
+    print("UNUN, pe coaxial, montați un șoc RF (RF Choke) eficient.")
+    print(f"\n* Vf total calculat pentru radiant: {res['vf_final']}")
+    print("Lăsați o rezervă de 20-30 cm pentru acordul fin prin pliere!")
+    print("=" * 45)
+    
+    input("\nApasă Enter pentru a închide fereastra...")
