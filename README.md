@@ -1,0 +1,2 @@
+# Calculatoare
+Aplicatii software
