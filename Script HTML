@@ -1,0 +1,218 @@
+<div class="efhw-calculator">
+    <div class="calculator-header">
+        <h1>Calculator Antenă EFHW</h1>
+        <h2>(160m - 80m - 40m)</h2>
+    </div>
+    <p style="font-size: 0.9em; color: #555; text-align: center;">Setați parametrii firului pentru a calcula lungimea optimă a radiantului și a contragreutății.</p>
+    <hr>
+
+    <div class="form-group">
+        <label for="frecventa">Frecvența centrală dorită (kHz):</label>
+        <input type="number" id="frecventa" value="3650" min="1810" max="7200">
+        <small>Sugestii: 160m (1850 kHz) | 80m (3650 kHz) | 40m (7100 kHz)</small>
+    </div>
+
+    <div class="form-group">
+        <label for="grosime">Grosime fir (secțiune în mm²):</label>
+        <select id="grosime">
+            <option value="1.5" selected>1.5 mm² (Standard / subtire)</option>
+            <option value="2.5">2.5 mm² sau mai gros</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="izolatie">Tipul firului (Izolație):</label>
+        <select id="izolatie">
+            <option value="da" selected>Fir izolat (MYF / PVC clasic)</option>
+            <option value="nu">Fir chel (Cupru chior / Liță emailată)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="inaltime">Înălțimea medie de instalare față de sol (metri):</label>
+        <input type="number" id="inaltime" value="10" min="1" max="50">
+    </div>
+
+    <div class="form-group">
+        <label for="unun">Raport transformator UNUN:</label>
+        <select id="unun">
+            <option value="49" selected>49:1 (Cel mai recomandat)</option>
+            <option value="64">64:1</option>
+        </select>
+    </div>
+
+    <button onclick="calculeazaEFHW()" class="btn-calc">Calculează Lungimea</button>
+
+    <div id="rezultate" class="results-box" style="display:none;">
+        <h3>Rezultate Estimate:</h3>
+        <p><strong>Lungime fir radiant (&lambda;/2):</strong> <span id="res-lungime" class="highlight">0</span> metri</p>
+        <p><strong>Lungime contragreutate dedicată (~0.05&lambda;):</strong> <span id="res-counterpoise" class="highlight-green">0</span> metri</p>
+        <p><strong>Impedanță la capătul antenei:</strong> <span id="res-imp-antena">0</span> &Omega;</p>
+        <p><strong>Impedanță reflectată în coaxial:</strong> <span id="res-imp-statie">0</span> &Omega;</p>
+        <p><strong>SWR estimat (la mufa UNUN):</strong> <span id="res-swr">1.0</span>:1</p>
+        
+        <div class="note-box">
+            <p><strong>Recomandare instalare YO8RCD:</strong></p>
+            <p>Conectați contragreutatea la masa UNUN-ului (gnd). Imediat după UNUN, pe cablul coaxial de coborâre, montați un <strong>șoc de radiofrecvență (RF Choke)</strong> eficient pentru a bloca cureții de pe tresă și a opri radiația parazită a coaxialului.</p>
+            <p style="font-size: 0.9em; margin-top: 10px; color: #555;"><em>*Notă tehnică: Factorul de viteză total calculat pentru radiant: <span id="res-vf">0</span>. Lăsați o rezervă de 20-30 cm pentru acordul fin prin pliere la capăt.</em></p>
+        </div>
+    </div>
+    
+    <div class="calculator-footer">
+        &copy; YO8RCD
+    </div>
+</div>
+
+<style>
+.efhw-calculator {
+    background: #f9f9f9;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 20px 20px 5px 20px; /* Redus padding jos pentru footer */
+    max-width: 450px;
+    margin: 20px auto;
+    font-family: sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+}
+.calculator-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.calculator-header h1 {
+    margin: 0;
+    color: #002b5c;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.calculator-header h2 {
+    margin: 5px 0 0 0;
+    color: #555;
+    font-size: 1.1em;
+    font-weight: normal;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.form-group small {
+    color: #777;
+    font-size: 0.8em;
+}
+.btn-calc {
+    background: #002b5c;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-calc:hover {
+    background: #004080;
+}
+.results-box {
+    margin-top: 20px;
+    background: #eef7ff;
+    border-left: 5px solid #002b5c;
+    padding: 15px;
+    border-radius: 4px;
+}
+.highlight {
+    font-size: 1.2em;
+    color: #d32f2f;
+    font-weight: bold;
+}
+.highlight-green {
+    font-size: 1.2em;
+    color: #2e7d32;
+    font-weight: bold;
+}
+.note-box {
+    margin-top: 15px;
+    padding: 10px;
+    background: #fff;
+    border: 1px dashed #bbb;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+.note-box p {
+    margin: 5px 0;
+}
+.calculator-footer {
+    text-align: right;
+    font-size: 0.75em;
+    color: #aaa;
+    margin-top: 15px;
+    font-weight: normal;
+}
+</style>
+
+<script>
+function calculeazaEFHW() {
+    let freqKhz = parseFloat(document.getElementById('frecventa').value);
+    let grosime = parseFloat(document.getElementById('grosime').value);
+    let izolata = document.getElementById('izolatie').value === 'da';
+    let inaltimeM = parseFloat(document.getElementById('inaltime').value);
+    let ununRaport = parseFloat(document.getElementById('unun').value);
+
+    if (isNaN(freqKhz) || isNaN(inaltimeM)) {
+        alert("Vă rugăm să introduceți valori numerice valide!");
+        return;
+    }
+
+    let freqMhz = freqKhz / 1000.0;
+    let lambda = 300.0 / freqMhz;
+    let inaltimeLambda = inaltimeM / lambda;
+
+    let vfTotal = 0.96;
+
+    let kIzolatie = izolata ? 0.97 : 1.0;
+    vfTotal *= kIzolatie;
+
+    let kInaltime = 1.0;
+    if (inaltimeLambda < 0.25) {
+        kInaltime = 1.0 - (0.04 * (1.0 - (inaltimeLambda / 0.25)));
+    }
+    vfTotal *= kInaltime;
+
+    let kGrosime = (grosime > 2.5) ? 0.995 : 1.0;
+    vfTotal *= kGrosime;
+
+    let lungimeFir = (150.0 / freqMhz) * vfTotal;
+    let lungimeContragreutate = (lambda * 0.05) * 0.95;
+
+    let impAntena = 3000;
+    if (inaltimeLambda < 0.1) {
+        impAntena = 2100;
+    } else if (inaltimeLambda < 0.25) {
+        impAntena = 2450;
+    }
+
+    let impStatie = impAntena / ununRaport;
+    let swr = (impStatie >= 50) ? (impStatie / 50.0) : (50.0 / impStatie);
+
+    document.getElementById('res-lungime').innerText = lungimeFir.toFixed(2);
+    document.getElementById('res-counterpoise').innerText = lungimeContragreutate.toFixed(2);
+    document.getElementById('res-imp-antena').innerText = impAntena;
+    document.getElementById('res-imp-statie').innerText = impStatie.toFixed(1);
+    document.getElementById('res-swr').innerText = swr.toFixed(2);
+    document.getElementById('res-vf').innerText = vfTotal.toFixed(3);
+
+    document.getElementById('rezultate').style.display = 'block';
+}
+</script>
