@@ -3,7 +3,7 @@
 Acest proiect pune la dispoziție un calculator utilitar dedicat radioamatorilor pentru dimensionarea antenelor **EFHW (End-Fed Half-Wave)** multibandă pentru benzile de 160, 80 și 40 de metri. 
 
 Sunt incluse două versiuni ale algoritmului:
-1. **Versiunea Web (HTML/JS/CSS):** Gata de integrat în bloguri sau site-uri (dezvoltată inițial pentru blogul YO8RCD).
+1. **Versiunea Web (HTML/JS/CSS):** Gata de integrat în bloguri sau site-uri (dezvoltată inițial pentru blogul [YO8RCD]([URL-ul complet al site-ului](https://yo8rcd.blogspot.com/2026/06/calculator-efhw.html)).
 2. **Versiunea Terminal (Python):** Pentru teste și rulare rapidă direct pe calculator.
 
 ---
